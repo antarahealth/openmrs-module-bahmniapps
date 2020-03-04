@@ -206,6 +206,14 @@ angular.module('bahmni.common.patientSearch')
                 });
             }
         };
+
+        $scope.isDueRefillable = function (row) {
+            if (row.date === undefined) {
+                return false;
+            }
+            const diffInDays = Bahmni.Common.Util.DateUtil.diffInDays(Bahmni.Common.Util.DateUtil.today(), row.date);
+            return row.Refillable === "Yes" && diffInDays < 3;
+        };
         initialize();
     }
 ]);

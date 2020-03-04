@@ -52,7 +52,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="row in search.visiblePatients">
+                    <tr ng-repeat="row in search.visiblePatients" ng-style="search.searchType.name=='Active Medications' && isDueRefillable(row)?{'background-color':'orange'} : {'background-color': 'white'}">
                         <!-- <td>
                             {{$index + 1}}
                         </td> -->
