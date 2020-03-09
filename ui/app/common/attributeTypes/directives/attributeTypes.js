@@ -19,7 +19,8 @@ angular.module('bahmni.common.attributeTypes', []).directive('attributeTypes', [
             const readonlyFields = [
                 "Passport Country Code",
                 "Passport Country Name",
-                "Passport Number"
+                "Passport Number",
+                "Beneficiary Group Name"
             ];
             $scope.getAutoCompleteList = $scope.getAutoCompleteList();
             $scope.getDataResults = $scope.getDataResults();
