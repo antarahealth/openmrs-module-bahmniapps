@@ -16,11 +16,19 @@ angular.module('bahmni.common.attributeTypes', []).directive('attributeTypes', [
         templateUrl: '../common/attributeTypes/views/attributeInformation.html',
         restrict: 'E',
         controller: function ($scope) {
+            const readonlyFields = [
+                "Passport Country Code",
+                "Passport Country Name",
+                "Passport Number",
+                "Beneficiary Group Name"
+            ];
             $scope.getAutoCompleteList = $scope.getAutoCompleteList();
             $scope.getDataResults = $scope.getDataResults();
             // to avoid watchers in one way binding
             $scope.isAutoComplete = $scope.isAutoComplete() || function () { return false; };
-            $scope.isReadOnly = $scope.isReadOnly() || function () { return false; };
+            $scope.isReadOnly = $scope.isReadOnly() || function (field) {
+                return readonlyFields.indexOf(field) !== -1;
+            };
             $scope.handleUpdate = $scope.handleUpdate() || function () { return false; };
 
             $scope.appendConceptNameToModel = function (attribute) {
