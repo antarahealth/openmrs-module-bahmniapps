@@ -71,6 +71,10 @@ angular.module('bahmni.common.config')
             return this.configs.relationshipTypeMap || {};
         };
 
+        this.assignHNRelationshipUuid = function () {
+            return this.configs.assignHNRelationshipUuid || "";
+        };
+
         this.loginLocationToVisitTypeMapping = function () {
             return this.configs.loginLocationToVisitTypeMapping || {};
         };

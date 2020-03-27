@@ -30,9 +30,18 @@ angular.module('bahmni.registration').factory('openmrsPatientMapper', ['patient'
                 return preferredAddress || {};
             },
             mapRelationships = function (patient, relationships) {
+                patient.hnAssignedRelationship = [];
+                for (var i = relationships.length - 1; i >= 0; i--) {
+                    if (relationships[i].relationshipType.uuid === $rootScope.assignHNUuid) {
+                        patient.hnAssignedRelationship.push(relationships.splice(i, 1)[0]);
+                    }
+                }
                 patient.relationships = relationships || [];
+                patient.hnAssignedRelationship = patient.hnAssignedRelationship || [];
                 patient.newlyAddedRelationships = [{}];
+                patient.newlyAddedHNRelationship = [{}];
                 patient.hasRelationships = patient.relationships.length > 0;
+                patient.hasHNRelationship = patient.hnAssignedRelationship.length > 0;
             },
 
             map = function (openmrsPatient) {
