@@ -116,12 +116,21 @@ angular.module('bahmni.registration')
                 var newRelationships = _.filter($scope.patient.newlyAddedRelationships, function (relationship) {
                     return relationship.relationshipType && relationship.relationshipType.uuid;
                 });
+                var newHNRelationships = _.filter($scope.patient.newlyAddedHNRelationship, function (relationship) {
+                    return relationship.relationshipType && relationship.relationshipType.uuid;
+                });
                 newRelationships = _.each(newRelationships, function (relationship) {
                     delete relationship.patientIdentifier;
                     delete relationship.content;
                     delete relationship.providerName;
                 });
+                newHNRelationships = _.each(newHNRelationships, function (relationship) {
+                    delete relationship.patientIdentifier;
+                    delete relationship.content;
+                    delete relationship.providerName;
+                });
                 $scope.patient.relationships = newRelationships;
+                $scope.patient.relationships = $scope.patient.relationships.concat(newHNRelationships);
             };
 
             var getConfirmationViaNgDialog = function (config) {
@@ -147,6 +156,7 @@ angular.module('bahmni.registration')
                 $scope.patient.isNew = true;
                 $scope.patient.registrationDate = dateUtil.now();
                 $scope.patient.newlyAddedRelationships = [{}];
+                $scope.newlyAddedHNRelationship = [{}];
                 $scope.actions.followUpAction(patientProfileData);
             };
 

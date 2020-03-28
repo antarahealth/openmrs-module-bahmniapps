@@ -78,12 +78,22 @@ angular.module('bahmni.registration')
                 var newRelationships = _.filter($scope.patient.newlyAddedRelationships, function (relationship) {
                     return relationship.relationshipType && relationship.relationshipType.uuid;
                 });
+                var newHNRelationships = _.filter($scope.patient.newlyAddedHNRelationship, function (relationship) {
+                    return relationship.relationshipType && relationship.relationshipType.uuid;
+                });
                 newRelationships = _.each(newRelationships, function (relationship) {
                     delete relationship.patientIdentifier;
                     delete relationship.content;
                     delete relationship.providerName;
                 });
+                newHNRelationships = _.each(newHNRelationships, function (relationship) {
+                    delete relationship.patientIdentifier;
+                    delete relationship.content;
+                    delete relationship.providerName;
+                });
+                const sanitizedHNrelationship = _.concat(newHNRelationships, $scope.patient.deletedHNRelationships);
                 $scope.patient.relationships = _.concat(newRelationships, $scope.patient.deletedRelationships);
+                $scope.patient.relationships = $scope.patient.relationships.concat(sanitizedHNrelationship);
             };
 
             $scope.isReadOnly = function (field) {

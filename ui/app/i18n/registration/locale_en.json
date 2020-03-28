@@ -112,5 +112,6 @@
   "PROGRAM_DELETE_REASON_PLACEHOLDER": "Reason to delete the program",
   "DELETE_LABEL": "Delete",
   "EDIT_LABEL": "Edit",
-  "REGISTRATION_LABEL_RELATIONSHIP_EXISTS": "Given relationship already exists"
+  "REGISTRATION_LABEL_RELATIONSHIP_EXISTS": "Given relationship already exists",
+  "REGISTRATION_ASSIGN_HN": "Assign Health Navigator"
 }

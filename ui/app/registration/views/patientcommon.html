@@ -237,6 +237,17 @@
         </section>
     </div>
 
+      <div class="box-container" ng-if="::(assignHNRelationship.length > 0)">
+          <legend class="additional-attribute" ng-show="::assignHNRelationship" toggle="patient.hasHNRelationship">
+          <span>
+              <i class="fa fa-caret-right"></i>
+              <i class="fa fa-caret-down"></i>
+              <strong><a ng-bind-html="::'REGISTRATION_ASSIGN_HN' | translate"></a></strong>
+          </span>
+          </legend>
+          <div assign-health-navigator patient="patient" ng-show="patient.hasHNRelationship"
+               ng-if="::assignHNRelationship"></div>
+      </div>
     <div ng-repeat="section in ::patientConfiguration.getOrderedPatientAttributesSections()"
          class="additional-info-wrapper">
         <div ng-if="section.canShow">

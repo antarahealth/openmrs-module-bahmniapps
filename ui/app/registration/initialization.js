@@ -4,7 +4,7 @@ angular.module('bahmni.registration').factory('initialization',
     ['$rootScope', '$q', 'configurations', 'authenticator', 'appService', 'spinner', 'preferences', 'locationService', 'mergeService',
         function ($rootScope, $q, configurations, authenticator, appService, spinner, preferences, locationService, mergeService) {
             var getConfigs = function () {
-                var configNames = ['encounterConfig', 'patientAttributesConfig', 'identifierTypesConfig', 'addressLevels', 'genderMap', 'relationshipTypeConfig', 'relationshipTypeMap', 'loginLocationToVisitTypeMapping'];
+                var configNames = ['encounterConfig', 'patientAttributesConfig', 'identifierTypesConfig', 'addressLevels', 'genderMap', 'relationshipTypeConfig', 'relationshipTypeMap', 'loginLocationToVisitTypeMapping', 'assignHNRelationshipUuid'];
                 return configurations.load(configNames).then(function () {
                     var mandatoryPersonAttributes = appService.getAppDescriptor().getConfigValue("mandatoryPersonAttributes");
                     var patientAttributeTypes = new Bahmni.Common.Domain.AttributeTypeMapper().mapFromOpenmrsAttributeTypes(configurations.patientAttributesConfig(), mandatoryPersonAttributes);
@@ -19,6 +19,13 @@ angular.module('bahmni.registration').factory('initialization',
                     $rootScope.genderMap = configurations.genderMap();
                     $rootScope.relationshipTypeMap = configurations.relationshipTypeMap();
                     $rootScope.relationshipTypes = configurations.relationshipTypes();
+                    $rootScope.assignHNUuid = configurations.assignHNRelationshipUuid();
+
+                    for (var i = $rootScope.relationshipTypes.length - 1; i >= 0; i--) {
+                        if ($rootScope.relationshipTypes[i].aIsToB === "Assigned HN") {
+                            $rootScope.assignHNRelationship = $rootScope.relationshipTypes.splice(i, 1);
+                        }
+                    }
                 });
             };
 
@@ -46,6 +53,9 @@ angular.module('bahmni.registration').factory('initialization',
                     return "patient";
                 }
                 $rootScope.relationshipTypes.forEach(function (relationshipType) {
+                    relationshipType.searchType = (relationshipTypeMap.provider.indexOf(relationshipType.aIsToB) > -1) ? "provider" : "patient";
+                });
+                $rootScope.assignHNRelationship.forEach(function (relationshipType) {
                     relationshipType.searchType = (relationshipTypeMap.provider.indexOf(relationshipType.aIsToB) > -1) ? "provider" : "patient";
                 });
             };
