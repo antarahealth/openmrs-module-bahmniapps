@@ -22,7 +22,7 @@ angular.module('bahmni.registration').factory('initialization',
                     $rootScope.assignHNUuid = configurations.assignHNRelationshipUuid();
 
                     for (var i = $rootScope.relationshipTypes.length - 1; i >= 0; i--) {
-                        if ($rootScope.relationshipTypes[i].aIsToB === "Assingned HN") {
+                        if ($rootScope.relationshipTypes[i].aIsToB === "Assigned HN") {
                             $rootScope.assignHNRelationship = $rootScope.relationshipTypes.splice(i, 1);
                         }
                     }
