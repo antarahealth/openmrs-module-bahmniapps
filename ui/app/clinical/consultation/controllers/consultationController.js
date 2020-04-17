@@ -2,11 +2,11 @@
 
 angular.module('bahmni.clinical').controller('ConsultationController',
     ['$scope', '$rootScope', '$state', '$location', '$translate', 'clinicalAppConfigService', 'diagnosisService', 'urlHelper', 'contextChangeHandler',
-        'spinner', 'encounterService', 'messagingService', 'sessionService', 'retrospectiveEntryService', 'patientContext', '$q',
+        'spinner', 'patientService', 'encounterService', 'messagingService', 'sessionService', 'retrospectiveEntryService', 'patientContext', '$q',
         'patientVisitHistoryService', '$stateParams', '$window', 'visitHistory', 'clinicalDashboardConfig', 'appService',
         'ngDialog', '$filter', 'configurations', 'visitConfig', 'conditionsService', 'configurationService', 'auditLogService',
         function ($scope, $rootScope, $state, $location, $translate, clinicalAppConfigService, diagnosisService, urlHelper, contextChangeHandler,
-                  spinner, encounterService, messagingService, sessionService, retrospectiveEntryService, patientContext, $q,
+                  spinner, patientService, encounterService, messagingService, sessionService, retrospectiveEntryService, patientContext, $q,
                   patientVisitHistoryService, $stateParams, $window, visitHistory, clinicalDashboardConfig, appService,
                   ngDialog, $filter, configurations, visitConfig, conditionsService, configurationService, auditLogService) {
             var DateUtil = Bahmni.Common.Util.DateUtil;
@@ -436,7 +436,21 @@ angular.module('bahmni.clinical').controller('ConsultationController',
                 $scope.dashboardDirty = true;
             };
 
+            const isPersonAttributesChanged = function(){
+                return $scope.patient.personAttributes && Object.keys($scope.patient.personAttributes).length > 0;
+            };
+
             $scope.save = function (toStateConfig) {
+                if (isPersonAttributesChanged()) {
+                    Object.keys($scope.patient.personAttributes).forEach(function (key) {
+                        const personAttribute = $scope.patient.personAttributes[key];
+                        const params = {
+                            "attributeType" : personAttribute.attributeType,
+                            "value": personAttribute.conceptUuid
+                        };
+                        patientService.updatePersonAttribute($scope.patient.uuid, params);
+                    });
+                }
                 if (!isFormValid()) {
                     $scope.$parent.$parent.$broadcast("event:errorsOnForm");
                     return $q.when({});

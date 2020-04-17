@@ -11,7 +11,8 @@ angular.module('bahmni.common.attributeTypes', []).directive('attributeTypes', [
             getDataResults: '&',
             handleUpdate: '&',
             isReadOnly: '&',
-            isForm: '=?'
+            isForm: '=?',
+            setValue: "="
         },
         templateUrl: '../common/attributeTypes/views/attributeInformation.html',
         restrict: 'E',
@@ -30,13 +31,17 @@ angular.module('bahmni.common.attributeTypes', []).directive('attributeTypes', [
                 return readonlyFields.indexOf(field) !== -1;
             };
             $scope.handleUpdate = $scope.handleUpdate() || function () { return false; };
-
             $scope.appendConceptNameToModel = function (attribute) {
                 var attributeValueConceptType = $scope.targetModel[attribute.name];
                 var concept = _.find(attribute.answers, function (answer) {
                     return answer.conceptId === attributeValueConceptType.conceptUuid;
                 });
                 attributeValueConceptType.value = concept && concept.fullySpecifiedName;
+                if ($scope.setValue != undefined) {
+                    attributeValueConceptType.attributeType = attribute.uuid;
+                    $scope.setValue(attribute.name, attributeValueConceptType);
+                }
+
             };
         }
     };
