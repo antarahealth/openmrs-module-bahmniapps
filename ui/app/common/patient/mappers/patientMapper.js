@@ -26,6 +26,11 @@ Bahmni.PatientMapper = function (patientConfig, $rootScope, $translate) {
 
         if (openmrsPatient.identifiers) {
             var primaryIdentifier = openmrsPatient.identifiers[0].primaryIdentifier;
+            angular.forEach(openmrsPatient.identifiers, function(identifier, key) {
+                if (identifier.identifierType.display === "Antara ID") {
+                    primaryIdentifier = identifier.identifier;
+                }
+            });
             patient.identifier = primaryIdentifier ? primaryIdentifier : openmrsPatient.identifiers[0].identifier;
         }
 
