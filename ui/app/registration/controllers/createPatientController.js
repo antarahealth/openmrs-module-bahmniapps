@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('bahmni.registration')
-    .controller('CreatePatientController', ['$scope', '$rootScope', '$state', 'patientService', 'patient', 'spinner', 'appService', 'messagingService', 'ngDialog', '$q',
-        function ($scope, $rootScope, $state, patientService, patient, spinner, appService, messagingService, ngDialog, $q) {
+    .controller('CreatePatientController', ['$scope', '$rootScope', '$state', 'patientService', 'patient', 'spinner', 'appService', 'messagingService', 'ngDialog', '$q', 'analyticService',
+        function ($scope, $rootScope, $state, patientService, patient, spinner, appService, messagingService, ngDialog, $q, analyticService) {
             var dateUtil = Bahmni.Common.Util.DateUtil;
             $scope.actions = {};
             var errorMessage;
@@ -213,6 +213,7 @@ angular.module('bahmni.registration')
 
             $scope.afterSave = function () {
                 messagingService.showMessage("info", "REGISTRATION_LABEL_SAVED");
+                analyticService.logEvent($scope.patient, 'Account Created', {});
                 $state.go("patient.edit", {
                     patientUuid: $scope.patient.uuid
                 });

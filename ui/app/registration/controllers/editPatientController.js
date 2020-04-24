@@ -2,9 +2,9 @@
 
 angular.module('bahmni.registration')
     .controller('EditPatientController', ['$scope', 'patientService', 'encounterService', '$stateParams', 'openmrsPatientMapper',
-        '$window', '$q', 'spinner', 'appService', 'messagingService', '$rootScope', 'auditLogService',
+        '$window', '$q', 'spinner', 'appService', 'messagingService', '$rootScope', 'auditLogService','analyticService',
         function ($scope, patientService, encounterService, $stateParams, openmrsPatientMapper, $window, $q, spinner,
-                  appService, messagingService, $rootScope, auditLogService) {
+                  appService, messagingService, $rootScope, auditLogService, analyticService) {
             var dateUtil = Bahmni.Common.Util.DateUtil;
             var uuid = $stateParams.patientUuid;
             $scope.patient = {};
@@ -103,5 +103,6 @@ angular.module('bahmni.registration')
             $scope.afterSave = function () {
                 auditLogService.log($scope.patient.uuid, Bahmni.Registration.StateNameEvenTypeMap['patient.edit'], undefined, "MODULE_LABEL_REGISTRATION_KEY");
                 messagingService.showMessage("info", "REGISTRATION_LABEL_SAVED");
+                analyticService.logEvent($scope.patient, 'Account Updated', {});
             };
         }]);
