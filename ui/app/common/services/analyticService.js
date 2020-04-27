@@ -5,8 +5,8 @@ angular.module('bahmni.common.services')
             identify(patient);
             $window.analytics.track(eventName, eventProps, {
                 integrations: {
-                  'All': true,
-                  'Mixpanel': true
+                    'All': true,
+                    'Mixpanel': true
                 }
             });
         };
@@ -15,12 +15,12 @@ angular.module('bahmni.common.services')
             const observations = encounter.observations;
             const eventsToSend = observations.map(ob => {
                 let values = {};
-                if(ob.conceptNameToDisplay === 'Interaction Log Form'){
+                if (ob.conceptNameToDisplay === 'Interaction Log Form') {
                     values = {
                         "interactionType": ob.groupMembers.find(m => m.conceptNameToDisplay === "Interactor type").valueAsString,
                         "modeOfCommunication": ob.groupMembers.find(m => m.conceptNameToDisplay === "Mode of Communication").valueAsString,
-                        "direction": ob.groupMembers.find(m => m.conceptNameToDisplay === "Interaction direction").valueAsString,
-                    }
+                        "direction": ob.groupMembers.find(m => m.conceptNameToDisplay === "Interaction direction").valueAsString
+                    };
                 }
                 return {
                     "name": "Encounter Created",
@@ -29,8 +29,8 @@ angular.module('bahmni.common.services')
                         "category": ob.conceptNameToDisplay,
                         ...values
                     }
-                }
-            })
+                };
+            });
             eventsToSend.forEach(e => logEvent(patient, e.name, e.props));
         };
 

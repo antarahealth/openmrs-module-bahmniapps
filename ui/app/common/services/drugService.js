@@ -52,4 +52,3 @@ angular.module('bahmni.common.services')
             getSetMembersOfConcept: getSetMembersOfConcept
         };
     }]);
-    
