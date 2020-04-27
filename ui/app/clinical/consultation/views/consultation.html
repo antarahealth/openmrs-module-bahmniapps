@@ -273,6 +273,12 @@
         <textarea ng-model="consultation.consultationNote.value" ng-change="onNoteChanged()"
                   placeholder="{{ 'CLINICAL_ENTER_NOTES_PLACEHOLDER'|translate }} " rows="6" msd-elastic></textarea>
     </section>
-
+    <section class="dashboard-section">
+        <h2 class="section-title section-title-pivot">
+            {{obsConfig.title | translate}}
+        </h2>
+        <bahmni-observation patient="patient" config="obsConfig.dashboardConfig" section="section"
+                            section-title="section | titleTranslate" is-on-dashboard="false"></bahmni-observation>
+    </section>
 </article>
 
