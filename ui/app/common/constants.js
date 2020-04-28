@@ -123,6 +123,7 @@ Bahmni.Common = Bahmni.Common || {};
         programAttributeTypes: RESTWS_V1 + "/programattributetype",
         relationshipTypesUrl: RESTWS_V1 + "/relationshiptype",
         personAttributeTypeUrl: RESTWS_V1 + "/personattributetype",
+        personUrl: RESTWS_V1 + "/person",
         diseaseSummaryPivotUrl: BAHMNI_CORE + "/diseaseSummaryData",
         allTestsAndPanelsConceptName: 'All_Tests_and_Panels',
         dosageFrequencyConceptName: 'Dosage Frequency',

@@ -1,16 +1,58 @@
 'use strict';
 
 angular.module('bahmni.common.conceptSet')
-    .controller('ConceptSetGroupController', ['$scope', 'contextChangeHandler', 'spinner', 'messagingService',
-        'conceptSetService', '$rootScope', 'sessionService', 'encounterService', 'treatmentConfig',
+    .controller('ConceptSetGroupController', ['$q', '$scope', 'contextChangeHandler', 'spinner', 'patientService', 'formService', 'messagingService',
+        'conceptSetService', '$rootScope', 'sessionService', 'encounterService', 'ngDialog', 'treatmentConfig',
         'retrospectiveEntryService', 'userService', 'conceptSetUiConfigService', '$timeout', 'clinicalAppConfigService', '$stateParams', '$translate',
-        function ($scope, contextChangeHandler, spinner, messagingService, conceptSetService, $rootScope, sessionService,
-                  encounterService, treatmentConfig, retrospectiveEntryService, userService,
+        function ($q, $scope, contextChangeHandler, spinner, patientService, formService, messagingService, conceptSetService, $rootScope, sessionService,
+                  encounterService, ngDialog, treatmentConfig, retrospectiveEntryService, userService,
                   conceptSetUiConfigService, $timeout, clinicalAppConfigService, $stateParams, $translate) {
             var conceptSetUIConfig = conceptSetUiConfigService.getConfig();
+
+            $scope.getPatientPreferences = function (params) {
+                return patientService.findPatientPersonAttribute(params).then(function (response) {
+                    if (response.data && response.data[0]) {
+                        $scope.contactInfo = response.data[0];
+                    }
+                }).then(function () {
+                    $scope.getPersonAttributes("6762ca1e-f7e2-4ae7-b119-561aa803cedd", "51fbdf76-3092-4989-93e0-ef6c87c4bf2c");
+                });
+            };
+
+            var mapAttributesToPatient = function () {
+                $scope.patientAttributeTypes.attributeTypes.forEach(function (attributeType) {
+                    if (attributeType.format === "org.openmrs.Concept" ) {
+                        var concept = _.find(attributeType.answers, function (answer) {
+                            if(attributeType.name.includes("Primary") && $scope.contactInfo.prefferedUuid && answer.conceptId === $scope.contactInfo.prefferedUuid) {
+                                return answer.conceptId;
+                            }else if (attributeType.name.includes("Secondary") && $scope.contactInfo.secondaryUuid && answer.conceptId === $scope.contactInfo.secondaryUuid) {
+                                return answer.conceptId
+                            }
+                        });
+                        $scope.patient[attributeType.name] =  {conceptUuid: concept.conceptId, value: concept.fullySpecifiedName};
+                    }
+                });
+            };
+
+            $scope.getPersonAttributes = function (primaryUuid, secondaryUuid) {
+                return spinner.forPromise($q.all([formService.getPersonAttributeTypesByUuid(primaryUuid),formService.getPersonAttributeTypesByUuid(secondaryUuid)]).then(function (response) {
+                    const patientAttributeTypes = [];
+                    angular.forEach(response, function (rawData) {
+                        patientAttributeTypes.push(rawData.data)
+                    });
+                    $scope.patientAttributeTypes = new Bahmni.Common.Domain.AttributeTypeMapper().mapFromOpenmrsAttributeTypes(patientAttributeTypes, '');
+                    mapAttributesToPatient();
+                }));
+            };
+
             var init = function () {
                 $scope.validationHandler = new Bahmni.ConceptSet.ConceptSetGroupPanelViewValidationHandler($scope.allTemplates);
                 contextChangeHandler.add($scope.validationHandler.validate);
+                const params = {
+                    q: 'bahmni.sqlGet.patientPersonAttributes',
+                    v: "full",
+                    patientUuid: $scope.patient.uuid};
+                $scope.getPatientPreferences(params);
             };
             $scope.toggleSideBar = function () {
                 $rootScope.showLeftpanelToggle = !$rootScope.showLeftpanelToggle;
@@ -193,7 +235,8 @@ angular.module('bahmni.common.conceptSet')
                 context: "=",
                 autoScrollEnabled: "=",
                 patient: "=",
-                consultation: "="
+                consultation: "=",
+                setValue: "="
 
             },
             controller: 'ConceptSetGroupController',

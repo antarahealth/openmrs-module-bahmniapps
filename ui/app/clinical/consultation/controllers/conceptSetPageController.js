@@ -8,8 +8,14 @@ angular.module('bahmni.clinical')
                   clinicalAppConfigService, messagingService, configurations, $state, spinner,
                   contextChangeHandler, $q, $translate, formService) {
             $scope.consultation.selectedObsTemplate = $scope.consultation.selectedObsTemplate || [];
+            $scope.patient.personAttributes = $scope.patient.personAttributes || [];
             $scope.allTemplates = $scope.allTemplates || [];
             $scope.scrollingEnabled = false;
+
+            $scope.setValue = function (model, value) {
+                $scope.patient.personAttributes[model] = value;
+            };
+
             var extensions = clinicalAppConfigService.getAllConceptSetExtensions($stateParams.conceptSetGroupName);
             var configs = clinicalAppConfigService.getAllConceptsConfig();
             var visitType = configurations.encounterConfig().getVisitTypeByUuid($scope.consultation.visitTypeUuid);
