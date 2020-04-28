@@ -53,4 +53,20 @@ angular.module('bahmni.common.patient')
                 withCredentials: true
             });
         };
+
+        this.findPatientPersonAttribute = function (params) {
+            return $http.get(Bahmni.Common.Constants.sqlUrl, {
+                method: "GET",
+                params: params,
+                withCredentials: true
+            });
+        };
+
+        this.updatePersonAttribute = function (patientUuid, params) {
+            const url = "{0}/{1}/attribute".format(Bahmni.Common.Constants.personUrl, patientUuid);
+            return $http.post(url, params, {
+                withCredentials: true,
+                headers: {"Accept": "application/json", "Content-Type": "application/json"}
+            });
+        }
     }]);

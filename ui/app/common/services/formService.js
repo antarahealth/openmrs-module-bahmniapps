@@ -35,11 +35,21 @@ angular.module('bahmni.common.conceptSet')
             return $http.get(Bahmni.Common.Constants.formTranslationsUrl, { params: form});
         };
 
+        var getPersonAttributeTypesByUuid = function (attributeUuid) {
+            return $http.get(Bahmni.Common.Constants.personAttributeTypeUrl +"/" + attributeUuid, {
+                params: {
+                    uuid : attributeUuid,
+                    v: 'custom:(uuid,name,sortWeight,description,format,concept)'},
+                withCredentials: true
+            });
+        };
+
         return {
             getFormList: getFormList,
             getAllForms: getAllForms,
             getFormDetail: getFormDetail,
             getFormTranslations: getFormTranslations,
-            getAllPatientForms: getAllPatientForms
+            getAllPatientForms: getAllPatientForms,
+            getPersonAttributeTypesByUuid: getPersonAttributeTypesByUuid
         };
     }]);

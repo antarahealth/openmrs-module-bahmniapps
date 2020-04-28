@@ -38,6 +38,27 @@ angular.module('bahmni.clinical')
             item.show = !item.show;
         };
 
+        $scope.obsConfig = {
+            "title": "Consultation Notes",
+            "isObservation": true,
+            "displayOrder": 5,
+            "dashboardConfig": {
+                "showDetailsButton": true,
+                "conceptNames": [
+                    "Consultation Note"
+                ],
+                "numberOfVisits": 10
+            },
+            "expandedViewConfig": {
+                "conceptNames": [
+                    "Consultation Note"
+                ],
+                "numberOfVisits": 15,
+                "showDetailsButton": true,
+                "pivotTable": {}
+            }
+        };
+
         $scope.isConsultationTabEmpty = function () {
             if (_.isEmpty($scope.consultation.newlyAddedDiagnoses) && _.isEmpty($scope.groupedObservations) &&
                 _.isEmpty($scope.consultation.newlyAddedSpecimens) && _.isEmpty($scope.consultation.consultationNote.value) &&

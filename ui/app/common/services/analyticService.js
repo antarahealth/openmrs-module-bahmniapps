@@ -12,7 +12,6 @@ angular.module('bahmni.common.services')
         };
 
         var logEncounter = function (patient, encounter) {
-            console.log("encounter", encounter);
             const observations = encounter.observations;
             const obsEventsToSend = observations.map(ob => {
                 let values = {};
