@@ -41,7 +41,6 @@ angular.module('bahmni.common.attributeTypes', []).directive('attributeTypes', [
                     attributeValueConceptType.attributeType = attribute.uuid;
                     $scope.setValue(attribute.name, attributeValueConceptType);
                 }
-
             };
         }
     };

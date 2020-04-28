@@ -68,5 +68,5 @@ angular.module('bahmni.common.patient')
                 withCredentials: true,
                 headers: {"Accept": "application/json", "Content-Type": "application/json"}
             });
-        }
+        };
     }]);

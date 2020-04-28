@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bahmni.common.uicontrols.programmanagment')
-    .controller('ManageProgramController', ['$scope', 'retrospectiveEntryService', '$window', 'programService', 
+    .controller('ManageProgramController', ['$scope', 'retrospectiveEntryService', '$window', 'programService',
         'spinner', 'messagingService', '$stateParams', '$q', 'confirmBox', 'analyticService',
         function ($scope, retrospectiveEntryService, $window, programService,
                   spinner, messagingService, $stateParams, $q, confirmBox, analyticService) {
@@ -140,8 +140,8 @@ angular.module('bahmni.common.uicontrols.programmanagment')
                             analyticService.logEvent($scope.patient, `Program Enrolled`, {
                                 id: $scope.programSelected.uuid
                             });
-                            return successCallback()
-                    }, failureCallback)
+                            return successCallback();
+                        }, failureCallback)
                 );
             };
 
@@ -208,7 +208,7 @@ angular.module('bahmni.common.uicontrols.programmanagment')
                         analyticService.logEvent($scope.patient, `Program Deleted`, {
                             id: patientProgram.uuid
                         });
-                        successCallback()
+                        successCallback();
                     }, failureCallback)
                     .then(closeConfirmBox);
                 spinner.forPromise(promise);
