@@ -2,7 +2,7 @@
 
 angular.module('bahmni.appointments')
     .service('calendarViewPopUp', ['$rootScope', 'ngDialog', '$state', '$translate', 'appointmentsService',
-        'confirmBox', 'checkinPopUp', 'appService', 'messagingService', 'appointmentCommonService', 'analyticService', 
+        'confirmBox', 'checkinPopUp', 'appService', 'messagingService', 'appointmentCommonService', 'analyticService',
         function ($rootScope, ngDialog, $state, $translate, appointmentsService, confirmBox, checkinPopUp, appService, messagingService, appointmentCommonService, analyticService) {
             var calendarViewPopUp = function (config) {
                 var popUpScope = $rootScope.$new();
