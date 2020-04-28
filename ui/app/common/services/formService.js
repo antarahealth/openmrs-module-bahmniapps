@@ -36,9 +36,9 @@ angular.module('bahmni.common.conceptSet')
         };
 
         var getPersonAttributeTypesByUuid = function (attributeUuid) {
-            return $http.get(Bahmni.Common.Constants.personAttributeTypeUrl +"/" + attributeUuid, {
+            return $http.get(Bahmni.Common.Constants.personAttributeTypeUrl + "/" + attributeUuid, {
                 params: {
-                    uuid : attributeUuid,
+                    uuid: attributeUuid,
                     v: 'custom:(uuid,name,sortWeight,description,format,concept)'},
                 withCredentials: true
             });

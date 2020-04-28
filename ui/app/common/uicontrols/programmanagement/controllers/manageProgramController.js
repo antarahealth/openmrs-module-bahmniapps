@@ -2,9 +2,9 @@
 
 angular.module('bahmni.common.uicontrols.programmanagment')
     .controller('ManageProgramController', ['$scope', 'retrospectiveEntryService', '$window', 'programService',
-        'spinner', 'messagingService', '$stateParams', '$q', 'confirmBox',
+        'spinner', 'messagingService', '$stateParams', '$q', 'confirmBox', 'analyticService',
         function ($scope, retrospectiveEntryService, $window, programService,
-                  spinner, messagingService, $stateParams, $q, confirmBox) {
+                  spinner, messagingService, $stateParams, $q, confirmBox, analyticService) {
             var DateUtil = Bahmni.Common.Util.DateUtil;
             $scope.programSelected = {};
             $scope.workflowStateSelected = {};
@@ -136,7 +136,12 @@ angular.module('bahmni.common.uicontrols.programmanagment')
                 var stateUuid = $scope.workflowStateSelected && $scope.workflowStateSelected.uuid ? $scope.workflowStateSelected.uuid : null;
                 return spinner.forPromise(
                     programService.enrollPatientToAProgram($scope.patient.uuid, $scope.programSelected.uuid, $scope.programEnrollmentDate, stateUuid, $scope.patientProgramAttributes, $scope.programAttributeTypes)
-                        .then(successCallback, failureCallback)
+                        .then(() => {
+                            analyticService.logEvent($scope.patient, `Program Enrolled`, {
+                                id: $scope.programSelected.uuid
+                            });
+                            return successCallback();
+                        }, failureCallback)
                 );
             };
 
@@ -187,14 +192,24 @@ angular.module('bahmni.common.uicontrols.programmanagment')
                 }
                 spinner.forPromise(
                     programService.updatePatientProgram(patientProgram, $scope.programAttributeTypes, dateCompleted)
-                        .then(successCallback, failureCallback)
+                        .then(() => {
+                            analyticService.logEvent($scope.patient, `Program Updated`, {
+                                id: patientProgram.uuid
+                            });
+                            successCallback();
+                        }, failureCallback)
                 );
             };
 
             var voidPatientProgram = function (patientProgram, closeConfirmBox) {
                 patientProgram.voided = true;
                 var promise = programService.updatePatientProgram(patientProgram, $scope.programAttributeTypes)
-                    .then(successCallback, failureCallback)
+                    .then(() => {
+                        analyticService.logEvent($scope.patient, `Program Deleted`, {
+                            id: patientProgram.uuid
+                        });
+                        successCallback();
+                    }, failureCallback)
                     .then(closeConfirmBox);
                 spinner.forPromise(promise);
             };

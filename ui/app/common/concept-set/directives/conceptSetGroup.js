@@ -21,24 +21,24 @@ angular.module('bahmni.common.conceptSet')
 
             var mapAttributesToPatient = function () {
                 $scope.patientAttributeTypes.attributeTypes.forEach(function (attributeType) {
-                    if (attributeType.format === "org.openmrs.Concept" ) {
+                    if (attributeType.format === "org.openmrs.Concept") {
                         var concept = _.find(attributeType.answers, function (answer) {
-                            if(attributeType.name.includes("Primary") && $scope.contactInfo.prefferedUuid && answer.conceptId === $scope.contactInfo.prefferedUuid) {
+                            if (attributeType.name.includes("Primary") && $scope.contactInfo.prefferedUuid && answer.conceptId === $scope.contactInfo.prefferedUuid) {
                                 return answer.conceptId;
-                            }else if (attributeType.name.includes("Secondary") && $scope.contactInfo.secondaryUuid && answer.conceptId === $scope.contactInfo.secondaryUuid) {
-                                return answer.conceptId
+                            } else if (attributeType.name.includes("Secondary") && $scope.contactInfo.secondaryUuid && answer.conceptId === $scope.contactInfo.secondaryUuid) {
+                                return answer.conceptId;
                             }
                         });
-                        $scope.patient[attributeType.name] =  {conceptUuid: concept.conceptId, value: concept.fullySpecifiedName};
+                        $scope.patient[attributeType.name] = {conceptUuid: concept.conceptId, value: concept.fullySpecifiedName};
                     }
                 });
             };
 
             $scope.getPersonAttributes = function (primaryUuid, secondaryUuid) {
-                return spinner.forPromise($q.all([formService.getPersonAttributeTypesByUuid(primaryUuid),formService.getPersonAttributeTypesByUuid(secondaryUuid)]).then(function (response) {
+                return spinner.forPromise($q.all([formService.getPersonAttributeTypesByUuid(primaryUuid), formService.getPersonAttributeTypesByUuid(secondaryUuid)]).then(function (response) {
                     const patientAttributeTypes = [];
                     angular.forEach(response, function (rawData) {
-                        patientAttributeTypes.push(rawData.data)
+                        patientAttributeTypes.push(rawData.data);
                     });
                     $scope.patientAttributeTypes = new Bahmni.Common.Domain.AttributeTypeMapper().mapFromOpenmrsAttributeTypes(patientAttributeTypes, '');
                     mapAttributesToPatient();

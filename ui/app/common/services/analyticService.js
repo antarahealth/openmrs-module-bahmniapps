@@ -1,9 +1,9 @@
 'use strict';
 angular.module('bahmni.common.services')
-    .factory('analyticService', ['$window', function ($window) {
+    .factory('analyticService', ['$window', '$rootScope', function ($window, $rootScope) {
         var logEvent = function (patient, eventName = '', eventProps = {}) {
             identify(patient);
-            $window.analytics.track(eventName, eventProps, {
+            $window.analytics.track(eventName, {...eventProps, loggedBy: $rootScope.currentUser.username}, {
                 integrations: {
                     'All': true,
                     'Mixpanel': true
@@ -13,7 +13,7 @@ angular.module('bahmni.common.services')
 
         var logEncounter = function (patient, encounter) {
             const observations = encounter.observations;
-            const eventsToSend = observations.map(ob => {
+            const obsEventsToSend = observations.map(ob => {
                 let values = {};
                 if (ob.conceptNameToDisplay === 'Interaction Log Form') {
                     values = {
@@ -31,14 +31,26 @@ angular.module('bahmni.common.services')
                     }
                 };
             });
-            eventsToSend.forEach(e => logEvent(patient, e.name, e.props));
+            obsEventsToSend.forEach(e => logEvent(patient, e.name, e.props));
+
+            const medications = encounter.treatmentDrugs;
+            const medsEventsToSend = medications.map(med => {
+                return {
+                    "name": "Medication Created",
+                    props: {
+                        "encounterId": encounter.encounterUuid
+                    }
+                };
+            });
+            medsEventsToSend.forEach(e => logEvent(patient, e.name, e.props));
         };
 
         var identify = function (patient) {
             $window.analytics.identify(
                 patient.primaryIdentifier ? patient.primaryIdentifier.identifier : patient.identifier,
                 {
-                    name: patient.fullNameLocal ? patient.fullNameLocal() : patient.name
+                    name: patient.fullNameLocal ? patient.fullNameLocal() : patient.name,
+                    loggedBy: $rootScope.currentUser.username
                 },
                 {
                     integrations: {

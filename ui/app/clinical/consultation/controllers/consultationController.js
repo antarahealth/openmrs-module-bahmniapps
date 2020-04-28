@@ -436,7 +436,7 @@ angular.module('bahmni.clinical').controller('ConsultationController',
                 $scope.dashboardDirty = true;
             };
 
-            const isPersonAttributesChanged = function(){
+            const isPersonAttributesChanged = function () {
                 return $scope.patient.personAttributes && Object.keys($scope.patient.personAttributes).length > 0;
             };
 
@@ -445,7 +445,7 @@ angular.module('bahmni.clinical').controller('ConsultationController',
                     Object.keys($scope.patient.personAttributes).forEach(function (key) {
                         const personAttribute = $scope.patient.personAttributes[key];
                         const params = {
-                            "attributeType" : personAttribute.attributeType,
+                            "attributeType": personAttribute.attributeType,
                             "value": personAttribute.conceptUuid
                         };
                         patientService.updatePersonAttribute($scope.patient.uuid, params);

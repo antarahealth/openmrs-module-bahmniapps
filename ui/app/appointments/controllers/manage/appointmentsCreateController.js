@@ -3,9 +3,9 @@
 angular.module('bahmni.appointments')
     .controller('AppointmentsCreateController', ['$scope', '$rootScope', '$q', '$window', '$state', '$translate', 'spinner', 'patientService',
         'appointmentsService', 'appointmentsServiceService', 'messagingService', 'appointmentCommonService',
-        'ngDialog', 'appService', '$stateParams', 'appointmentCreateConfig', 'appointmentContext', '$http', 'sessionService',
+        'ngDialog', 'appService', '$stateParams', 'appointmentCreateConfig', 'appointmentContext', '$http', 'sessionService', 'analyticService',
         function ($scope, $rootScope, $q, $window, $state, $translate, spinner, patientService, appointmentsService, appointmentsServiceService,
-                  messagingService, appointmentCommonService, ngDialog, appService, $stateParams, appointmentCreateConfig, appointmentContext, $http, sessionService) {
+                  messagingService, appointmentCommonService, ngDialog, appService, $stateParams, appointmentCreateConfig, appointmentContext, $http, sessionService, analyticService) {
             $scope.isFilterOpen = $stateParams.isFilterOpen;
             $scope.showConfirmationPopUp = true;
             $scope.enableSpecialities = appService.getAppDescriptor().getConfigValue('enableSpecialities');
@@ -527,7 +527,13 @@ angular.module('bahmni.appointments')
             };
 
             var saveAppointment = function (appointment) {
-                return spinner.forPromise(appointmentsService.save(appointment).then(function () {
+                return spinner.forPromise(appointmentsService.save(appointment).then(function (res) {
+                    analyticService.logEvent(res.data.patient, $scope.isEditMode() ? 'Appointment Editted' : 'Appointment Created', {
+                        service: res.data.service.name,
+                        location: res.data.location && res.data.location.name,
+                        startTime: new Date(res.data.startDateTime),
+                        id: res.data.uuid
+                    });
                     messagingService.showMessage('info', 'APPOINTMENT_SAVE_SUCCESS');
                     $scope.showConfirmationPopUp = false;
                     var params = $state.params;
