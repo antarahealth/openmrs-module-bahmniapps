@@ -1,9 +1,9 @@
 'use strict';
 angular.module('bahmni.common.services')
-    .factory('analyticService', ['$window', function ($window) {
+    .factory('analyticService', ['$window', '$rootScope', function ($window, $rootScope) {
         var logEvent = function (patient, eventName = '', eventProps = {}) {
             identify(patient);
-            $window.analytics.track(eventName, eventProps, {
+            $window.analytics.track(eventName, {...eventProps, loggedBy: $rootScope.currentUser.username}, {
                 integrations: {
                     'All': true,
                     'Mixpanel': true
@@ -49,7 +49,8 @@ angular.module('bahmni.common.services')
             $window.analytics.identify(
                 patient.primaryIdentifier ? patient.primaryIdentifier.identifier : patient.identifier,
                 {
-                    name: patient.fullNameLocal ? patient.fullNameLocal() : patient.name
+                    name: patient.fullNameLocal ? patient.fullNameLocal() : patient.name,
+                    loggedBy: $rootScope.currentUser.username
                 },
                 {
                     integrations: {
