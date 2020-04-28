@@ -12,8 +12,9 @@ angular.module('bahmni.common.services')
         };
 
         var logEncounter = function (patient, encounter) {
+            console.log("encounter", encounter);
             const observations = encounter.observations;
-            const eventsToSend = observations.map(ob => {
+            const obsEventsToSend = observations.map(ob => {
                 let values = {};
                 if (ob.conceptNameToDisplay === 'Interaction Log Form') {
                     values = {
@@ -31,7 +32,18 @@ angular.module('bahmni.common.services')
                     }
                 };
             });
-            eventsToSend.forEach(e => logEvent(patient, e.name, e.props));
+            obsEventsToSend.forEach(e => logEvent(patient, e.name, e.props));
+
+            const medications = encounter.treatmentDrugs;
+            const medsEventsToSend = medications.map(med => {
+                return {
+                    "name": "Medication Created",
+                    props: {
+                        "encounterId": encounter.encounterUuid
+                    }
+                };
+            });
+            medsEventsToSend.forEach(e => logEvent(patient, e.name, e.props));
         };
 
         var identify = function (patient) {

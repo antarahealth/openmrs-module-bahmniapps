@@ -2,8 +2,8 @@
 
 angular.module('bahmni.appointments')
     .service('calendarViewPopUp', ['$rootScope', 'ngDialog', '$state', '$translate', 'appointmentsService',
-        'confirmBox', 'checkinPopUp', 'appService', 'messagingService', 'appointmentCommonService',
-        function ($rootScope, ngDialog, $state, $translate, appointmentsService, confirmBox, checkinPopUp, appService, messagingService, appointmentCommonService) {
+        'confirmBox', 'checkinPopUp', 'appService', 'messagingService', 'appointmentCommonService', 'analyticService', 
+        function ($rootScope, ngDialog, $state, $translate, appointmentsService, confirmBox, checkinPopUp, appService, messagingService, appointmentCommonService, analyticService) {
             var calendarViewPopUp = function (config) {
                 var popUpScope = $rootScope.$new();
                 var dialog;
@@ -58,6 +58,12 @@ angular.module('bahmni.appointments')
                         toStatus: toStatus
                     });
                     return appointmentsService.changeStatus(appointment.uuid, toStatus, onDate).then(function () {
+                        analyticService.logEvent(appointment.patient, `Appointment ${toStatus}`, {
+                            service: appointment.service.name,
+                            location: appointment.location && appointment.location.name,
+                            startTime: new Date(appointment.startDateTime),
+                            id: appointment.uuid
+                        });
                         appointment.status = toStatus;
                         closeConfirmBox();
                         messagingService.showMessage('info', message);
