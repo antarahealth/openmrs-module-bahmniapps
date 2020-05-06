@@ -1,5 +1,11 @@
 <div class="autocomplete">
-    <input id="{{::observation.uniqueId}}" class="concept-name"
+    <input ng-if="observation.label == 'Current Condition'" ng-model="chosenCondition.concept.name" type="text"  id="{{::observation.uniqueId}}"
+           bahmni-autocomplete source="getDiagnosis"
+           on-select="getAddConditionMethod()"
+           ng-change="consultation.condition.clearConcept()"
+           ng-class="{illegalValue: !(chosenCondition.concept.name || chosenCondition.condition.isEmpty())}"
+           >
+    <input ng-if="observation.label != 'Current Condition'" id="{{::observation.uniqueId}}" class="concept-name"
            ng-model="observation.value"
            ng-disabled="observation.disabled"
            ng-blur="handleUpdate()"
