@@ -29,7 +29,9 @@ angular.module('bahmni.common.conceptSet')
                                 return answer.conceptId;
                             }
                         });
-                        $scope.patient[attributeType.name] = {conceptUuid: concept.conceptId, value: concept.fullySpecifiedName};
+                        if (concept) {
+                            $scope.patient[attributeType.name] = {conceptUuid: concept.conceptId, value: concept.fullySpecifiedName};
+                        }
                     }
                 });
             };
