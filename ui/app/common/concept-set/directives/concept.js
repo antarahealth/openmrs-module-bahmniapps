@@ -1,14 +1,17 @@
 'use strict';
 
 angular.module('bahmni.common.conceptSet')
-    .directive('concept', ['RecursionHelper', 'spinner', '$filter', 'messagingService',
-        function (RecursionHelper, spinner, $filter, messagingService) {
+    .directive('concept', ['RecursionHelper', 'spinner', '$filter', 'messagingService', 'diagnosisService',
+        function (RecursionHelper, spinner, $filter, messagingService, diagnosisService) {
             var link = function (scope) {
                 var hideAbnormalbuttonConfig = scope.observation && scope.observation.conceptUIConfig && scope.observation.conceptUIConfig['hideAbnormalButton'];
 
                 scope.now = moment().format("YYYY-MM-DD hh:mm:ss");
                 scope.showTitle = scope.showTitle === undefined ? true : scope.showTitle;
                 scope.hideAbnormalButton = hideAbnormalbuttonConfig == undefined ? scope.hideAbnormalButton : hideAbnormalbuttonConfig;
+                if (scope.observation === "Current Condition") {
+                    scope.chosenCondition = scope.chosenCondition || new Bahmni.Common.Domain.Condition();
+                }
 
                 scope.cloneNew = function (observation, parentObservation) {
                     observation.showAddMoreButton = function () {
@@ -23,12 +26,17 @@ angular.module('bahmni.common.conceptSet')
                 };
 
                 scope.removeClonedObs = function (observation, parentObservation) {
+                    if (observation.label === "Current Condition") {
+                        scope.$emit("removed-condition", scope.chosenCondition);
+                    }
                     observation.voided = true;
                     var lastObservationByLabel = _.findLast(parentObservation.groupMembers, function (groupMember) {
                         return groupMember.label === observation.label && !groupMember.voided;
                     });
 
-                    lastObservationByLabel.showAddMoreButton = function () { return true; };
+                    lastObservationByLabel.showAddMoreButton = function () {
+                        return true;
+                    };
                     observation.hidden = true;
                 };
 
@@ -71,6 +79,43 @@ angular.module('bahmni.common.conceptSet')
 
                 scope.handleUpdate = function () {
                     scope.$root.$broadcast("event:observationUpdated-" + scope.conceptSetName, scope.observation.concept.name, scope.rootObservation);
+                };
+
+                scope.getAddConditionMethod = function () {
+                    return function (item) {
+                        scope.chosenCondition = scope.chosenCondition || new Bahmni.Common.Domain.Condition();
+                        scope.chosenCondition.concept.uuid = item.lookup.uuid;
+                        scope.chosenCondition.concept.name = item.lookup.name;
+                        scope.$emit("added-condition", item);
+                    };
+                };
+
+                var mapConcept = function (result) {
+                    return _.map(result.data, function (concept) {
+                        var response = {
+                            value: concept.matchedName || concept.conceptName,
+                            concept: {
+                                name: concept.conceptName,
+                                uuid: concept.conceptUuid
+                            },
+                            lookup: {
+                                name: concept.matchedName || concept.conceptName,
+                                uuid: concept.conceptUuid
+                            }
+                        };
+
+                        if (concept.matchedName && concept.matchedName !== concept.conceptName) {
+                            response.value = response.value + " => " + concept.conceptName;
+                        }
+                        if (concept.code) {
+                            response.value = response.value + " (" + concept.code + ")";
+                        }
+                        return response;
+                    });
+                };
+
+                scope.getDiagnosis = function (params) {
+                    return diagnosisService.getAllFor(params.term).then(mapConcept);
                 };
 
                 scope.update = function (value) {

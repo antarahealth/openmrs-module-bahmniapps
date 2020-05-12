@@ -279,6 +279,90 @@ angular.module('bahmni.common.conceptSet')
                         return;
                     }
                 };
+
+                $scope.$on("added-condition", function (event, data) {
+                    if ($scope.consultation.condition === undefined) {
+                        $scope.consultation.condition = new Bahmni.Common.Domain.Condition();
+                    }
+                    $scope.consultation.condition.concept.uuid = data.lookup.uuid;
+                    data.value = $scope.consultation.condition.concept.name = data.lookup.name;
+                    addCondition($scope.consultation.condition);
+                });
+
+                $scope.$on("removed-condition", function (event, removedCondition) {
+                    if (removedCondition.concept) {
+                        const found = _.find($scope.consultation.conditions, function (condition) {
+                            return condition.concept.uuid === removedCondition.concept.uuid;
+                        });
+                        if (found) {
+                            const index = $scope.consultation.conditions.indexOf(found);
+                            $scope.consultation.conditions.splice(index, 1);
+                        }
+                    }
+                });
+
+                var findExistingCondition = function (newCondition) {
+                    return _.find($scope.consultation.conditions, function (condition) {
+                        if (newCondition.conditionNonCoded) {
+                            return condition.conditionNonCoded == newCondition.conditionNonCoded;
+                        }
+                        return condition.concept.uuid == newCondition.concept.uuid;
+                    });
+                };
+
+                var updateOrAddCondition = function (condition) {
+                    var existingCondition = findExistingCondition(condition);
+                    if (!existingCondition) {
+                        $scope.consultation.conditions.push(condition);
+                        clearCondition();
+                        return;
+                    }
+                    if (!existingCondition.uuid) {
+                        _.pull($scope.consultation.conditions, existingCondition);
+                        $scope.consultation.conditions.push(condition);
+                        clearCondition();
+                        return;
+                    }
+                    if (existingCondition.isActive()) {
+                        messagingService.showMessage('error', 'CONDITION_LIST_ALREADY_EXISTS_AS_ACTIVE');
+                        return;
+                    }
+                    if (existingCondition.activeSince && condition.onSetDate) {
+                        if (!DateUtil.isBeforeDate(existingCondition.activeSince - 1, condition.onSetDate)) {
+                            messagingService.showMessage('error', $translate.instant('CONDITION_LIST_ALREADY_EXISTS', {
+                                lastActive: DateUtil.formatDateWithoutTime(existingCondition.activeSince),
+                                status: existingCondition.status
+                            }));
+                            return;
+                        }
+                    }
+                    if (existingCondition.status != condition.status) {
+                        existingCondition.onSetDate = condition.onSetDate || DateUtil.today();
+                        existingCondition.status = condition.status;
+                    }
+                    existingCondition.additionalDetail = condition.additionalDetail;
+                    if (existingCondition.isActive()) {
+                        existingCondition.activeSince = existingCondition.endDate;
+                    }
+                    clearCondition();
+                };
+
+                var addCondition = function (condition_) {
+                    var condition = _.cloneDeep(condition_);
+                    if (condition_.isNonCoded) {
+                        condition.conditionNonCoded = condition.concept.name;
+                        condition.concept = {};
+                    }
+                    condition.voided = false;
+                    condition.status = 'ACTIVE';
+                    updateOrAddCondition(new Bahmni.Common.Domain.Condition(condition));
+                };
+
+                var clearCondition = function () {
+                    $scope.consultation.condition = new Bahmni.Common.Domain.Condition();
+                    $scope.consultation.condition.showNotes = false;
+                };
+
                 var init = function () {
                     return conceptSetService.getConcept({
                         name: conceptSetName,
@@ -307,7 +391,7 @@ angular.module('bahmni.common.conceptSet')
 
                 var validateObservationTree = function () {
                     if (typeof $scope.rootObservation === "undefined" || $scope.rootObservation === null) {
-                        return {allow: true, errorMessage: null };
+                        return {allow: true, errorMessage: null};
                     }
                     $scope.atLeastOneValueIsSet = $scope.rootObservation && $scope.rootObservation.atLeastOneValueSet();
                     $scope.conceptSetRequired = $scope.required ? $scope.required : true;
@@ -407,6 +491,10 @@ angular.module('bahmni.common.conceptSet')
                     }
                 });
 
+                $scope.getDiagnosis = function (params) {
+                    return diagnosisService.getAllFor(params.term).then(mapConcept);
+                };
+
                 $scope.$on('$destroy', function () {
                     deregisterObservationUpdated();
                     deregisterAddMore();
@@ -426,7 +514,8 @@ angular.module('bahmni.common.conceptSet')
                     conceptSetFocused: "=?",
                     collapseInnerSections: "=?",
                     atLeastOneValueIsSet: "=?",
-                    sectionId: "="
+                    sectionId: "=",
+                    consultation: "="
                 },
                 templateUrl: '../common/concept-set/views/conceptSet.html',
                 controller: controller
