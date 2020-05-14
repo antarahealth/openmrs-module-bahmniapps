@@ -1,7 +1,7 @@
 'use strict';
 angular.module('bahmni.common.services')
     .factory('analyticService', ['$window', '$rootScope', function ($window, $rootScope) {
-        var logEvent = function (patient, eventName = '', eventProps = {}) {
+        var logEvent = function (patient, eventName, eventProps) {
             identify(patient);
             $window.analytics.track(eventName, {...eventProps, loggedBy: $rootScope.currentUser.username}, {
                 integrations: {
@@ -95,8 +95,8 @@ angular.module('bahmni.common.services')
             );
         };
 
-        var load = function (apiKey = 'VtDgJW0n3zuvpYcfzINVlP9B31oHgUBB') {
-            $window.analytics.load(apiKey);
+        var load = function (apiKey) {
+            $window.analytics.load(apiKey || 'VtDgJW0n3zuvpYcfzINVlP9B31oHgUBB');
         };
 
         return {
