@@ -1,7 +1,7 @@
 'use strict';
 angular.module('bahmni.common.services')
     .factory('analyticService', ['$window', '$rootScope', function ($window, $rootScope) {
-        var logEvent = function (patient, eventName = '', eventProps = {}) {
+        var logEvent = function (patient, eventName, eventProps) {
             identify(patient);
             $window.analytics.track(eventName, {...eventProps, loggedBy: $rootScope.currentUser.username}, {
                 integrations: {
@@ -46,12 +46,46 @@ angular.module('bahmni.common.services')
         };
 
         var identify = function (patient) {
+            const genders = {
+                "M": "Male",
+                "F": "Female"
+            };
+            const userId = patient.primaryIdentifier ? patient.primaryIdentifier.identifier : patient.identifier;
+            const patientNonPIIattributes = {
+                name: userId,
+                gender: genders[patient.gender],
+                dateofbirth: patient.birthdate,
+                scribeRegistrationDate: patient.registrationDate,
+                maritalStatus: patient['Marital Status'] && patient['Marital Status'].value,
+                assignedHns: patient.hnAssignedRelationship && patient.hnAssignedRelationship.map(hn => hn.personB.display),
+                preferredLanguage: patient['Preferred language'],
+                isEnrolledInNHIF: patient['Is enrolled in NHIF'] && patient['Is enrolled in NHIF'].value,
+                typeOfCover: patient['Type of Cover'] && patient['Type of Cover'].value,
+                memberType: patient['Member Type, Dependent'] && patient['Member Type, Dependent'].value,
+                coverRiders: patient['Cover Riders e.g Dental, Optical'],
+                dateOfEnrollment: patient['Date of Enrollment'],
+                preferredAntaraFacility: patient['Preferred Antara Facility'] && patient['Preferred Antara Facility'].value,
+                payorFullName: patient['Payor Full Name'],
+                primaryPreferredMethodofContact: patient['Primary Preferred Method of Contact'] && patient['Primary Preferred Method of Contact'].value,
+                preferredSecondaryMethodofContact: patient['preferredSecondaryMethodofContact'] && patient['preferredSecondaryMethodofContact'].value,
+                beneficiaryStatus: patient['Beneficiary Status'] && patient['Beneficiary Status'].value,
+                chronicCover: patient['Chronic Cover'] && patient['Chronic Cover'].value,
+                payorRelationship: patient['Payor Relationship'] && patient['Payor Relationship'].value,
+                coverageStartDate: patient['Coverage Start Date'],
+                ICUCover: patient['ICU Cover'] && patient['ICU Cover'].value,
+                MRI: patient['MRI'],
+                dental: patient['Dental'],
+                privateRoom: patient['Private Room'],
+                ruralCover: patient['Rural Cover'],
+                copay: patient['Copay'],
+                optical: patient['Optical'],
+                executivePass: patient['Executive Pass'],
+                inpatientLimit: patient['Inpatient Limit']
+            };
+
             $window.analytics.identify(
-                patient.primaryIdentifier ? patient.primaryIdentifier.identifier : patient.identifier,
-                {
-                    name: patient.fullNameLocal ? patient.fullNameLocal() : patient.name,
-                    loggedBy: $rootScope.currentUser.username
-                },
+                userId,
+                patientNonPIIattributes,
                 {
                     integrations: {
                         'All': true,
@@ -61,8 +95,8 @@ angular.module('bahmni.common.services')
             );
         };
 
-        var load = function (apiKey = 'VtDgJW0n3zuvpYcfzINVlP9B31oHgUBB') {
-            $window.analytics.load(apiKey);
+        var load = function (apiKey) {
+            $window.analytics.load(apiKey || 'VtDgJW0n3zuvpYcfzINVlP9B31oHgUBB');
         };
 
         return {
